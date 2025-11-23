@@ -1,9 +1,23 @@
 import { useState } from 'react';
 import { Shield, CheckCircle, XCircle } from 'lucide-react';
 
+type ApprovalStatus = 'approved' | 'denied';
+
+interface PersonStatus {
+  [key: string]: ApprovalStatus;
+}
+
 function AdminPage() {
   const [cookieSet, setCookieSet] = useState(false);
   const [cookieRemoved, setCookieRemoved] = useState(false);
+  const [personStatuses, setPersonStatuses] = useState<PersonStatus>({
+    Brendan: 'approved',
+    Ethan: 'approved',
+    Jackson: 'approved',
+    Hunter: 'approved',
+    Bryson: 'approved',
+    Nic: 'approved',
+  });
 
   const handleSetAdminCookie = () => {
     const adminToken = crypto.randomUUID();
@@ -24,9 +38,16 @@ function AdminPage() {
     }, 3000);
   };
 
+  const togglePersonStatus = (name: string) => {
+    setPersonStatuses(prev => ({
+      ...prev,
+      [name]: prev[name] === 'approved' ? 'denied' : 'approved'
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-6">
-      <div className="max-w-md w-full">
+      <div className="max-w-2xl w-full space-y-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
           <div className="flex items-center justify-center mb-6">
             <div className="bg-slate-100 p-4 rounded-full">
@@ -94,6 +115,28 @@ function AdminPage() {
               This sets a secure cookie that identifies this browser as having admin privileges.
               The cookie is valid for one year.
             </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Access Control</h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {Object.keys(personStatuses).map((name) => (
+              <div key={name} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <span className="font-medium text-slate-700">{name}</span>
+                <button
+                  onClick={() => togglePersonStatus(name)}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 ${
+                    personStatuses[name] === 'approved'
+                      ? 'bg-green-500 hover:bg-green-600 text-white'
+                      : 'bg-red-500 hover:bg-red-600 text-white'
+                  }`}
+                >
+                  {personStatuses[name] === 'approved' ? 'Approved' : 'Denied'}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
