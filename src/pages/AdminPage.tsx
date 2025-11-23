@@ -1,5 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, CheckCircle, XCircle } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 type ApprovalStatus = 'approved' | 'denied';
 
@@ -10,14 +16,35 @@ interface PersonStatus {
 function AdminPage() {
   const [cookieSet, setCookieSet] = useState(false);
   const [cookieRemoved, setCookieRemoved] = useState(false);
-  const [personStatuses, setPersonStatuses] = useState<PersonStatus>({
-    Brendan: 'approved',
-    Ethan: 'approved',
-    Jackson: 'approved',
-    Hunter: 'approved',
-    Bryson: 'approved',
-    Nic: 'approved',
-  });
+  const [personStatuses, setPersonStatuses] = useState<PersonStatus>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAccessControl();
+  }, []);
+
+  const loadAccessControl = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('access_control')
+        .select('person_name, status')
+        .order('person_name');
+
+      if (error) throw error;
+
+      if (data) {
+        const statusMap: PersonStatus = {};
+        data.forEach(item => {
+          statusMap[item.person_name] = item.status as ApprovalStatus;
+        });
+        setPersonStatuses(statusMap);
+      }
+    } catch (error) {
+      console.error('Error loading access control:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSetAdminCookie = () => {
     const adminToken = crypto.randomUUID();
@@ -38,11 +65,24 @@ function AdminPage() {
     }, 3000);
   };
 
-  const togglePersonStatus = (name: string) => {
-    setPersonStatuses(prev => ({
-      ...prev,
-      [name]: prev[name] === 'approved' ? 'denied' : 'approved'
-    }));
+  const togglePersonStatus = async (name: string) => {
+    const newStatus = personStatuses[name] === 'approved' ? 'denied' : 'approved';
+
+    try {
+      const { error } = await supabase
+        .from('access_control')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('person_name', name);
+
+      if (error) throw error;
+
+      setPersonStatuses(prev => ({
+        ...prev,
+        [name]: newStatus
+      }));
+    } catch (error) {
+      console.error('Error updating access control:', error);
+    }
   };
 
   return (
@@ -121,6 +161,11 @@ function AdminPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
           <h2 className="text-2xl font-bold text-slate-900 mb-6">Access Control</h2>
 
+          {loading ? (
+            <div className="text-center py-8">
+              <p className="text-slate-600">Loading...</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Object.keys(personStatuses).map((name) => (
               <div key={name} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -138,6 +183,7 @@ function AdminPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
     </div>
