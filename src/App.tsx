@@ -6,6 +6,7 @@ import JacksonPage from './pages/JacksonPage';
 import HunterPage from './pages/HunterPage';
 import BrysonPage from './pages/BrysonPage';
 import NicPage from './pages/NicPage';
+import ApprovedPage from './pages/ApprovedPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/hunter" element={<HunterPage />} />
         <Route path="/bryson" element={<BrysonPage />} />
         <Route path="/nic" element={<NicPage />} />
+        <Route path="/approved" element={<ApprovedPage />} />
       </Routes>
     </BrowserRouter>
   );
