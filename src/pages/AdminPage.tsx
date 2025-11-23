@@ -16,6 +16,8 @@ interface PersonStatus {
 function AdminPage() {
   const [cookieSet, setCookieSet] = useState(false);
   const [cookieRemoved, setCookieRemoved] = useState(false);
+  const [approvalCookieSet, setApprovalCookieSet] = useState(false);
+  const [approvalCookieRemoved, setApprovalCookieRemoved] = useState(false);
   const [personStatuses, setPersonStatuses] = useState<PersonStatus>({});
   const [loading, setLoading] = useState(true);
 
@@ -62,6 +64,25 @@ function AdminPage() {
 
     setTimeout(() => {
       setCookieRemoved(false);
+    }, 3000);
+  };
+
+  const handleSetApprovalCookie = () => {
+    const approvalToken = crypto.randomUUID();
+    document.cookie = `approval_token=${approvalToken}; path=/; max-age=31536000; SameSite=Strict`;
+    setApprovalCookieSet(true);
+
+    setTimeout(() => {
+      setApprovalCookieSet(false);
+    }, 3000);
+  };
+
+  const handleRemoveApprovalCookie = () => {
+    document.cookie = 'approval_token=; path=/; max-age=0; SameSite=Strict';
+    setApprovalCookieRemoved(true);
+
+    setTimeout(() => {
+      setApprovalCookieRemoved(false);
     }, 3000);
   };
 
@@ -154,6 +175,69 @@ function AdminPage() {
             <p className="text-xs text-slate-600 text-center leading-relaxed">
               This sets a secure cookie that identifies this browser as having admin privileges.
               The cookie is valid for one year.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-2">
+            Approval System
+          </h2>
+          <p className="text-slate-600 text-center mb-8">
+            Enable approval-based redirects for subdirectories
+          </p>
+
+          <div className="space-y-3">
+            <button
+              onClick={handleSetApprovalCookie}
+              disabled={approvalCookieSet}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            >
+              {approvalCookieSet ? (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Approval Cookie Set
+                </>
+              ) : (
+                'Set Approval Cookie'
+              )}
+            </button>
+
+            <button
+              onClick={handleRemoveApprovalCookie}
+              disabled={approvalCookieRemoved}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            >
+              {approvalCookieRemoved ? (
+                <>
+                  <XCircle className="w-5 h-5" />
+                  Approval Cookie Removed
+                </>
+              ) : (
+                'Remove Approval Cookie'
+              )}
+            </button>
+          </div>
+
+          {approvalCookieSet && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-800 text-sm text-center font-medium">
+                Approval cookie has been successfully set. Person pages will now redirect based on approval status.
+              </p>
+            </div>
+          )}
+
+          {approvalCookieRemoved && (
+            <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <p className="text-orange-800 text-sm text-center font-medium">
+                Approval cookie has been successfully removed. Person pages will display normally.
+              </p>
+            </div>
+          )}
+
+          <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <p className="text-xs text-slate-600 text-center leading-relaxed">
+              When the approval cookie is active, visiting person subdirectories will redirect to /approved or /denied based on their status in the database.
             </p>
           </div>
         </div>
