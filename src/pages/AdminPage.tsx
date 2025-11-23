@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Shield, CheckCircle } from 'lucide-react';
+import { Shield, CheckCircle, XCircle } from 'lucide-react';
 
 function AdminPage() {
   const [cookieSet, setCookieSet] = useState(false);
+  const [cookieRemoved, setCookieRemoved] = useState(false);
 
   const handleSetAdminCookie = () => {
     const adminToken = crypto.randomUUID();
@@ -11,6 +12,15 @@ function AdminPage() {
 
     setTimeout(() => {
       setCookieSet(false);
+    }, 3000);
+  };
+
+  const handleRemoveAdminCookie = () => {
+    document.cookie = 'admin_token=; path=/; max-age=0; SameSite=Strict';
+    setCookieRemoved(true);
+
+    setTimeout(() => {
+      setCookieRemoved(false);
     }, 3000);
   };
 
@@ -31,25 +41,50 @@ function AdminPage() {
             Grant administrative privileges to this browser
           </p>
 
-          <button
-            onClick={handleSetAdminCookie}
-            disabled={cookieSet}
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-          >
-            {cookieSet ? (
-              <>
-                <CheckCircle className="w-5 h-5" />
-                Admin Cookie Set
-              </>
-            ) : (
-              'Set Admin Cookie'
-            )}
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={handleSetAdminCookie}
+              disabled={cookieSet}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            >
+              {cookieSet ? (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Admin Cookie Set
+                </>
+              ) : (
+                'Set Admin Cookie'
+              )}
+            </button>
+
+            <button
+              onClick={handleRemoveAdminCookie}
+              disabled={cookieRemoved}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            >
+              {cookieRemoved ? (
+                <>
+                  <XCircle className="w-5 h-5" />
+                  Admin Cookie Removed
+                </>
+              ) : (
+                'Remove Admin Cookie'
+              )}
+            </button>
+          </div>
 
           {cookieSet && (
             <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-green-800 text-sm text-center font-medium">
                 Admin cookie has been successfully set for this browser
+              </p>
+            </div>
+          )}
+
+          {cookieRemoved && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800 text-sm text-center font-medium">
+                Admin cookie has been successfully removed from this browser
               </p>
             </div>
           )}
