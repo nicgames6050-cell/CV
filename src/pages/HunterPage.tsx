@@ -4,7 +4,7 @@ function HunterPage() {
   return (
     <RedirectPage
       withoutCookie="https://sites.google.com/view/cvkeycard/hunter-samuel"
-      withCookie="https://sites.google.com/view/cvoffical4/diner-hunter"
+      withCookie="https://sites.google.com/view/cvofficial4/diner-hunter"
     />
   );
 }

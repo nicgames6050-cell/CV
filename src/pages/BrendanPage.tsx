@@ -4,7 +4,7 @@ function BrendanPage() {
   return (
     <RedirectPage
       withoutCookie="https://sites.google.com/view/cvkeycard/brendan-vanvreede"
-      withCookie="https://sites.google.com/view/cvoffical4/diner-brendan"
+      withCookie="https://sites.google.com/view/cvofficial4/diner-brendan"
     />
   );
 }

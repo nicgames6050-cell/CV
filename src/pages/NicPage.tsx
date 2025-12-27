@@ -4,7 +4,7 @@ function NicPage() {
   return (
     <RedirectPage
       withoutCookie="https://sites.google.com/view/cvkeycard/nicholas-vanvreede"
-      withCookie="https://sites.google.com/view/cvoffical4/diner-nic"
+      withCookie="https://sites.google.com/view/cvofficial4/diner-nic"
     />
   );
 }

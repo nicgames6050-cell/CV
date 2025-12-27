@@ -4,7 +4,7 @@ function EthanPage() {
   return (
     <RedirectPage
       withoutCookie="https://sites.google.com/view/cvkeycard/ethan-vanvreede"
-      withCookie="https://sites.google.com/view/cvoffical4/diner-ethan"
+      withCookie="https://sites.google.com/view/cvofficial4/diner-ethan"
     />
   );
 }
